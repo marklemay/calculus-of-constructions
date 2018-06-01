@@ -10,8 +10,6 @@ import org.scalacheck.Gen
 import cc.Cc.Var
 import cc.Cc.Exp
 
-//import org.scalatest.prop.Checkers._
-
 import org.scalacheck.ScalacheckShapeless._
 
 object CcSpec extends Properties("CcSpec") {
@@ -32,5 +30,6 @@ object CcSpec extends Properties("CcSpec") {
       e.ty().get == e.norm.ty().get
     }
   }
+
 
 }

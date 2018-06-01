@@ -58,7 +58,7 @@ object Cc {
       case Pi(ty, bod)  => Pi(ty.norm, bod.norm)
 
       case App(f, a) => (f.norm, a.norm) match {
-        case (Lam(_, bod), aNorm) => bod.sub(aNorm)
+        case (Lam(_, bod), aNorm) => bod.sub(aNorm).norm
         case (fNorm, aNorm)       => App(fNorm, aNorm)
       }
     }
@@ -92,7 +92,7 @@ object Cc {
       case _ => None
     }
 
+    override def toString(): String = CcPrettyPrinter.Printer(this, Set(), List())._2.s
   }
-
 
 }

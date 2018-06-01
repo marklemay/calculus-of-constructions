@@ -19,4 +19,18 @@ object CcProperties {
     case App(f, a)    => freeVars(f) ++ freeVars(a)
   }
 
+  object Appls {
+    def unapply(e: Exp): Option[List[Exp]] = e match {
+      case App(f, a) => {
+        unapply(f) match {
+          case None     => Some(List(f, a))
+          case Some(ls) => Some(ls ++ List(a))
+        }
+      }
+      case _ => None
+    }
+
+//    def apply(ls: List[Exp])
+  }
+
 }

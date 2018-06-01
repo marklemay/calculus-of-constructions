@@ -30,7 +30,7 @@ object CcParserSpec extends Properties("CcParserSpec") {
 
   property("can always parse a closed term") = forAll { e: Exp =>
     freeVars(e).isEmpty ==> {
-      //      println(e)
+      println(e)
       CcParser.parse(e.toString()) match {
         case CcParser.Success(e2, _) => e == e2
         case _                       => false

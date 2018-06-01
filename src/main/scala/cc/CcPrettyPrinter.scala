@@ -1,6 +1,7 @@
 package cc
 
 import cc.Cc._
+import cc.CcProperties.Appls
 
 object CcPrettyPrinter {
   //TODO: this is a bit of a mess
@@ -18,28 +19,22 @@ object CcPrettyPrinter {
   case class Outer(s: String) extends PartialOutput
 
   //TODO: put in class
-  def showClosed(out: PartialOutput): String = out match {
+  def showTy(out: PartialOutput): String = out match {
     case Atom(s)    => s"$s"
     case Outer(s)   => s"[$s]"
     case AppList(s) => s"$s"
   }
 
-  def showOpen(out: PartialOutput): String = out match {
+  def showBod(out: PartialOutput): String = out match {
     case Atom(s)    => s"$s"
-    case Outer(s)   => s"[$s]"
+    case Outer(s)   => s"$s"
     case AppList(s) => s"($s)"
   }
 
-  object Apps {
-    def unapply(e: Exp): Option[List[Exp]] = e match {
-      case App(f, a) => {
-        unapply(f) match {
-          case None     => Some(List(f, a))
-          case Some(ls) => Some(ls ++ List(a))
-        }
-      }
-      case _ => None
-    }
+  def showApp(out: PartialOutput): String = out match {
+    case Atom(s)    => s"$s"
+    case Outer(s)   => s"[$s]"
+    case AppList(s) => s"($s)"
   }
 
   //TODO: does scala have a state monad? if so this should be rewritten with that
@@ -57,7 +52,7 @@ object CcPrettyPrinter {
       val (vars2, prettyTy) = Printer(ty, vars1, nameCtx)
       val (vars3, prettyBod) = Printer(bod, vars2, newvar :: nameCtx)
 
-      (vars3, Outer(s"λ $newvar : ${showClosed(prettyTy)} . ${showOpen(prettyBod)}"))
+      (vars3, Outer(s"λ $newvar : ${showTy(prettyTy)} . ${showBod(prettyBod)}"))
     }
 
     case Pi(ty, bod) => {
@@ -67,10 +62,10 @@ object CcPrettyPrinter {
       val (vars2, prettyTy) = Printer(ty, vars1, nameCtx)
       val (vars3, prettyBod) = Printer(bod, vars2, newvar :: nameCtx)
 
-      (vars3, Outer(s"Π $newvar : ${showClosed(prettyTy)} . ${showOpen(prettyBod)}"))
+      (vars3, Outer(s"Π $newvar : ${showTy(prettyTy)} . ${showBod(prettyBod)}"))
     }
 
-    case Apps(ls) => {
+    case Appls(ls) => {
       var temp = allVars
 
       val out: List[PartialOutput] = for (e <- ls) yield {
@@ -79,7 +74,7 @@ object CcPrettyPrinter {
         part
       }
 
-      (temp, AppList(out.map(showOpen).mkString(" ")))
+      (temp, AppList(out.map(showApp).mkString(" ")))
     }
   }
 

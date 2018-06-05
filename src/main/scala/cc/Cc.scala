@@ -86,7 +86,7 @@ object Cc {
       case App(f, a) => for {
         Pi(aTy1, bodTy) <- f.ty(ctx).map(_.norm) //TODO: break to cleaner multi line?
         aTy2 <- a.ty(ctx)
-        if aTy1 == aTy2
+        if aTy1.norm == aTy2.norm
       } yield bodTy.sub(a).norm
 
       case _ => None

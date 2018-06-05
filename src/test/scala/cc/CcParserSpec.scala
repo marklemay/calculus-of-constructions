@@ -9,6 +9,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import cc.Cc.Var
 import cc.Cc.Exp
+import cc.Cc.Prop
 
 import org.scalacheck.ScalacheckShapeless._
 
@@ -25,6 +26,8 @@ object CcParserSpec extends Properties("CcParserSpec") {
       i <- Gen.choose(0, 25)
     } yield Var(i)
   }
+
+  implicit def shrinkExp: Shrink[Var] = Shrink { case _ => Stream() }
 
   implicit val arbVar: Arbitrary[Var] = Arbitrary(genVar)
 

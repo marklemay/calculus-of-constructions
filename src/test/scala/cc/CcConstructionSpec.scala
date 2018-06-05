@@ -36,4 +36,6 @@ object CcConstructionSpec extends Properties("CcConstructionSpec") {
     import ArrowConstruction._
     a == fromExp(toExp(a)).get
   }
+  
+  
 }

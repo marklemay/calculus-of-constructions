@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import cc.CcParser._
 
+import CcProperties._
 //import cc
 
 class CcTest {
@@ -25,5 +26,10 @@ class CcTest {
       """.norm == exp)
   }
 
-  
+  @Test
+  def smallstepMatchesBigStepTests {
+    val e = cc"λ A : ● . λ B : □ . (● ([λ C : □ . □] □))"
+
+    assert(e.norm == smallStep(e))
+  }
 }

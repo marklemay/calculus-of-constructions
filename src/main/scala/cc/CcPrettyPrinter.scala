@@ -28,7 +28,7 @@ object CcPrettyPrinter {
   def showBod(out: PartialOutput): String = out match {
     case Atom(s)    => s"$s"
     case Outer(s)   => s"$s"
-    case AppList(s) => s"($s)"
+    case AppList(s) => s"($s)" //TODO: unneeded?
   }
 
   def showApp(out: PartialOutput): String = out match {

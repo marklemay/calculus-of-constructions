@@ -9,6 +9,7 @@ import cc_with_constructions.Constructions
 
 import cc.CcParser._
 import cc_with_constructions.ConstructionsConfig
+import cc_with_constructions.CcConstructionsParser
 
 //import cc
 
@@ -33,4 +34,56 @@ class CcConstructionsTest {
     println(printer(a, Set(), List())(ConstructionsConfig(Constructions.ArrowConstruction)))
 
   }
+
+  @Test
+  def prodTest {
+    import cc.Cc._
+    import Constructions.ProdConstruction._
+    //    import CcConstructionsPrettyPrinter._
+
+    val p = Prod(Var(0), Var(0))
+
+    //    val withScope = Pi(Prop(), toExp(p))
+    //
+    //    println(withScope)
+    //    println(fromExp(Pi(Prop(), Pi(Pi(Var(3), Var(1)), Var(1)))))
+    //
+    //    println(printer(withScope, Set(), List())(ConstructionsConfig(Constructions.ProdConstruction)))
+
+    println(toExp(p))
+    println(fromExp(toExp(p)))
+
+    assert(p == fromExp(toExp(p)).get)
+
+  }
+
+  @Test
+  def prodprintTest {
+    import Constructions.ProdConstruction._
+
+    import CcConstructionsPrettyPrinter._
+
+    val a = cc"ΠA:●. ΠOUT:●. Πf: [Πa:A. Πaa:A. OUT ] . OUT "
+
+    println(printer(a, Set(), List())(ConstructionsConfig(Constructions.ProdConstruction)))
+
+    val a2 = cc"ΠA:●. Πpr:( ΠOUT:●. Πf: [Πa:A. Πaa:A. OUT ] . OUT ). A "
+
+    println(printer(a2, Set(), List())(ConstructionsConfig(Constructions.ProdConstruction, Constructions.ArrowConstruction)))
+
+  }
+
+  @Test
+  def arrowParserTest {
+    val exp = CcConstructionsParser.parse("Π A : ● . Π B : ● . A → B")(ConstructionsConfig(Constructions.ArrowConstruction))
+    //A → A → B
+    //TODO: mixin application into
+
+    println(exp)
+
+    println(CcConstructionsParser.parse("Π A : ● . Π B : ● . A → A → B")(ConstructionsConfig(Constructions.ArrowConstruction)))
+    
+    println(CcConstructionsParser.parse("Π A : ● . Π B : ● . A → A A → B")(ConstructionsConfig(Constructions.ArrowConstruction)))
+  }
+
 }

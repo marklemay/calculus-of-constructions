@@ -1,36 +1,83 @@
 package cc
 
 import cc.Cc._
+import cc_with_constructions.ConstructionsConfig
 
 // additional features that are nice to have but are not needed for the core normalization and type checking
 object CcProperties {
-  //TODO: can do some implicit magic so that it looks like these are members of Exp without cluttering the definition
 
-  def removeBinder(vs: Set[Var]): Set[Var] = vs.filter(_.v != 0).map(va => Var(va.v - 1))
+  implicit def expToRichExp(exp: Exp) = new RichExp(exp)
 
-  def freeVars(e: Exp): Set[Var] = e match {
-    case Var(i)       => Set(Var(i))
+  class RichExp(exp: Exp) {
 
-    case Prop()       => Set()
-    case Typ()        => Set()
+    private def removeBinder(vs: Set[Var]): Set[Var] = vs.filter(_.v != 0).map(va => Var(va.v - 1))
 
-    case Lam(ty, bod) => freeVars(ty) ++ removeBinder(freeVars(bod))
-    case Pi(ty, bod)  => freeVars(ty) ++ removeBinder(freeVars(bod))
+    def freeVars: Set[Var] = exp match {
+      case Var(i)       => Set(Var(i))
 
-    case App(f, a)    => freeVars(f) ++ freeVars(a)
-  }
+      case Prop()       => Set()
+      case Typ()        => Set()
 
-  def replaceVar(e: Exp, here: Var, withThis: Exp): Exp = e match {
-    case v: Var if v == here => withThis
-    case v: Var if v != here => v
+      case Lam(ty, bod) => ty.freeVars ++ removeBinder(bod.freeVars)
+      case Pi(ty, bod)  => ty.freeVars ++ removeBinder(bod.freeVars)
 
-    case Prop()              => Prop()
-    case Typ()               => Typ()
+      case App(f, a)    => f.freeVars ++ a.freeVars
+    }
 
-    case Lam(ty, bod)        => Lam(replaceVar(ty, here, withThis), replaceVar(bod, Var(here.v + 1), withThis.open()))
-    case Pi(ty, bod)         => Pi(replaceVar(ty, here, withThis), replaceVar(bod, Var(here.v + 1), withThis.open()))
+    def replaceVar(here: Var, withThis: Exp): Exp = exp match {
+      case v: Var if v == here => withThis
+      case v: Var if v != here => v
 
-    case App(f, a)           => App(replaceVar(f, here, withThis), replaceVar(a, here, withThis))
+      case Prop()              => Prop()
+      case Typ()               => Typ()
+
+      case Lam(ty, bod)        => Lam(ty.replaceVar(here, withThis), bod.replaceVar(Var(here.v + 1), withThis.open()))
+      case Pi(ty, bod)         => Pi(ty.replaceVar(here, withThis), bod.replaceVar(Var(here.v + 1), withThis.open()))
+
+      case App(f, a)           => App(f.replaceVar(here, withThis), a.replaceVar(here, withThis))
+    }
+
+    def smallStep: Exp = exp match {
+      case Var(i)                  => Var(i)
+
+      case Prop()                  => Prop()
+      case Typ()                   => Typ()
+
+      case Lam(ty, bod)            => Lam(ty.smallStep, bod.smallStep)
+      case Pi(ty, bod)             => Pi(ty.smallStep, bod.smallStep)
+
+      case App(Lam(_, bod), a)     => bod.sub(a)
+      case App(f, a) if !f.isValue => App(f.smallStep, a)
+      case App(f, a) if f.isValue  => App(f, a.smallStep)
+    }
+
+    def isValue: Boolean = exp match {
+      case Var(i)              => true
+
+      case Prop()              => true
+      case Typ()               => true
+
+      case Lam(ty, bod)        => ty.isValue && bod.isValue
+      case Pi(ty, bod)         => ty.isValue && bod.isValue
+
+      case App(Lam(_, bod), a) => false
+      case App(f, a)           => f.isValue && a.isValue
+    }
+
+    //can't do anything cleaner with toString
+    def show(implicit config: ConstructionsConfig = ConstructionsConfig()): String = CcConstructionsPrettyPrinter.printer(exp, Set(), List())(config)._2.s
+
+    def toScala: String = exp match {
+      case Var(i)       => s"Var($i)"
+
+      case Prop()       => s"Prop()"
+      case Typ()        => s"Typ()"
+
+      case Lam(ty, bod) => s"Lam(${ty.toScala}, ${bod.toScala})"
+      case Pi(ty, bod)  => s"Pi(${ty.toScala}, ${bod.toScala})"
+
+      case App(f, a)    => s"Pi(${f.toScala}, ${a.toScala})"
+    }
   }
 
   object Appls {
@@ -47,30 +94,4 @@ object CcProperties {
     //    def apply(ls: List[Exp])
   }
 
-  def smallStep(e: Exp): Exp = e match {
-    case Var(i)                   => Var(i)
-
-    case Prop()                   => Prop()
-    case Typ()                    => Typ()
-
-    case Lam(ty, bod)             => Lam(smallStep(ty), smallStep(bod))
-    case Pi(ty, bod)              => Pi(smallStep(ty), smallStep(bod))
-
-    case App(Lam(_, bod), a)      => bod.sub(a)
-    case App(f, a) if !isValue(f) => App(smallStep(f), a)
-    case App(f, a) if isValue(f)  => App(f, smallStep(a))
-  }
-
-  def isValue(e: Exp): Boolean = e match {
-    case Var(i)              => true
-
-    case Prop()              => true
-    case Typ()               => true
-
-    case Lam(ty, bod)        => isValue(ty) && isValue(bod)
-    case Pi(ty, bod)         => isValue(ty) && isValue(bod)
-
-    case App(Lam(_, bod), a) => false
-    case App(f, a)           => isValue(f) && isValue(a)
-  }
 }

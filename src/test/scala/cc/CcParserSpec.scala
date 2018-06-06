@@ -14,12 +14,11 @@ import cc.Cc.Prop
 import org.scalacheck.ScalacheckShapeless._
 
 import CcProperties._
-//import scala.util.parsing.combinator.Parsers.Success
 
 object CcParserSpec extends Properties("CcParserSpec") {
 
   override def overrideParameters(p: Test.Parameters): Test.Parameters =
-    p.withMinSuccessfulTests(1000000) // 1000000 is good for a coffee break :)
+    p.withMinSuccessfulTests(1000) // 1000000 is good for a coffee break :)
 
   def genVar: Gen[Var] = {
     for {
@@ -32,8 +31,7 @@ object CcParserSpec extends Properties("CcParserSpec") {
   implicit val arbVar: Arbitrary[Var] = Arbitrary(genVar)
 
   property("can always parse a closed term") = forAll { e: Exp =>
-    freeVars(e).isEmpty ==> {
-      println(e)
+    e.freeVars.isEmpty ==> {
       CcParser.parse(e.toString()) match {
         case CcParser.Success(e2, _) => e == e2
         case _                       => false
@@ -43,8 +41,7 @@ object CcParserSpec extends Properties("CcParserSpec") {
 
   // the above test makes this redundent
   property("can always parse a closed term") = forAll { e: Exp =>
-    freeVars(e).isEmpty ==> {
-      //      println(e)
+    e.freeVars.isEmpty ==> {
       CcParser.parse(e.toString()).successful
     }
   }

@@ -4,6 +4,7 @@ import scala.util.parsing.combinator._
 import cc.Cc._
 import scala.annotation.migration
 
+//TODO: still very inefficient
 class CcConstructionsParser extends RegexParsers {
   def prop: Parser[Prop] = "●" ^^^ Prop()
   def typ: Parser[Typ] = "□" ^^^ Typ()
@@ -26,13 +27,13 @@ class CcConstructionsParser extends RegexParsers {
     { case head ~ rest => rest.foldLeft[Exp](head)(App) }
 
   def parseConstruction(ls: List[Constructions.Construction])(ctx: List[String])(config: ConstructionsConfig): Parser[Exp] = ls match {
-    case List()       => apps(ctx)(config) //failure("cannot parse")
-    case head :: tail => head.parserExp(ctx)(config)(this) | parseConstruction(tail)(ctx)(config)
+    case List()       => apps(ctx)(config)
+    case head :: tail => head.parserExp(ctx)(config)(this)(parseConstruction(tail)(ctx)(config)) | parseConstruction(tail)(ctx)(config)
   }
 
-  def subExp(ctx: List[String])(config: ConstructionsConfig) =  parseConstruction(config.configs.toList)(ctx)(config)
+  def subExp(ctx: List[String])(config: ConstructionsConfig) = parseConstruction(config.configs.toList)(ctx)(config)
 
-  def exp(ctx: List[String])(config: ConstructionsConfig): Parser[Exp] = prop | typ | variable(ctx) | lam(ctx)(config) | pi(ctx)(config) | "(" ~> subExp(ctx)(config) <~ ")" | "[" ~> exp(ctx)(config) <~ "]"
+  def exp(ctx: List[String])(config: ConstructionsConfig): Parser[Exp] = prop | typ | variable(ctx) | lam(ctx)(config) | pi(ctx)(config) | "(" ~> subExp(ctx)(config) <~ ")" | "[" ~> subExp(ctx)(config) <~ "]"
 
 }
 
@@ -40,12 +41,12 @@ object CcConstructionsParser extends CcConstructionsParser {
 
   def parse(s: String)(config: ConstructionsConfig): ParseResult[Exp] = parse(subExp(List())(config), s)
 
-  //  implicit class SimpleCCParserHelper(val sc: StringContext) extends AnyVal {
-  //    def cc(args: Any*): Exp = parse(sc.standardInterpolator({ x => x }, args)) match {
-  //      case Success(matched, _) => matched //TODO: if "" is empty
-  //      //      case Failure(msg, _)     => println("FAILURE: " + msg)
-  //      //      case Error(msg, _)       => println("ERROR: " + msg)
-  //    }
-  //  }
+  implicit class CcConstructionsParserHelper(val sc: StringContext) extends AnyVal {
+    def ccc(args: Any*)(implicit config: ConstructionsConfig = ConstructionsConfig()): Exp = parse(sc.standardInterpolator({ x => x }, args))(config) match {
+      case Success(matched, _) => matched //TODO: if "" is empty
+      //      case Failure(msg, _)     => println("FAILURE: " + msg)
+      //      case Error(msg, _)       => println("ERROR: " + msg)
+    }
+  }
 
 }

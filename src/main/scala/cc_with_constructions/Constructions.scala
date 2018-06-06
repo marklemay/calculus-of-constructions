@@ -8,6 +8,14 @@ import cc.Cc.Var
 import cc.CcConstructionsPrettyPrinter._
 import cc.Cc.Prop
 
+import cc.CcPrettyPrinter.PartialOutput
+import cc.CcPrettyPrinter.Atom
+import cc.CcPrettyPrinter.AppList
+import cc.CcPrettyPrinter.Outer
+import cc.CcPrettyPrinter.showTy
+import cc.CcPrettyPrinter.showBod
+import cc.CcPrettyPrinter.showApp
+
 //TODO: figure out what should be implicit
 
 //somthing that looks and acts like a Cc expression
@@ -15,7 +23,9 @@ object Constructions { //TODO: paramiterixe these over generalized epressions?  
 
   trait Construction {
 
-    //    def form(se: Seq[Exp]): Constructed
+    //TODO: implicit conversion to expressions?
+
+    //TODO: Embed the notion of signature?
 
     type Constructed
 
@@ -24,16 +34,20 @@ object Constructions { //TODO: paramiterixe these over generalized epressions?  
 
     def pettyPrint(c: Constructed, ctx: PrintCtx, p: Printer)(config: ConstructionsConfig): (Set[String], PartialOutput) // (implicit config: ConstructionsConfig)
 
-    def parser(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser): restParser.Parser[Constructed]
+    def parser(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser)(parseLessPrecidence: restParser.Parser[Exp]): restParser.Parser[Constructed]
 
     //TODO a little funny
-    def parserExp(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser) = parser(ctx)(config)(restParser).map(toExp)
-    //CcConstructionsParser
+    def parserExp(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser)(parseLessPrecidence: restParser.Parser[Exp]) = parser(ctx)(config)(restParser)(parseLessPrecidence).map(toExp)
   }
 
-  //non depndent function
+  //TODO: split these into seperate files?
+  /** non depndent function */
   case object ArrowConstruction extends Construction {
 
+    object Arrow {
+      def unapply(e: Exp): Option[(Exp, Exp)] = fromExp(e).map(a => (a.ty, a.bod))
+
+    }
     case class Arrow(ty: Exp, bod: Exp)
 
     override type Constructed = Arrow
@@ -44,7 +58,7 @@ object Constructions { //TODO: paramiterixe these over generalized epressions?  
     }
 
     def fromExp(e: Exp): Option[Constructed] = e match {
-      case Pi(ty, bod) if !freeVars(bod).contains(Var(0)) => Some(Arrow(ty, bod.sub(Var(0))))
+      case Pi(ty, bod) if !bod.freeVars.contains(Var(0)) => Some(Arrow(ty, bod.sub(Var(0))))
       case _ => None
     }
 
@@ -57,44 +71,18 @@ object Constructions { //TODO: paramiterixe these over generalized epressions?  
       (vars2, AppList(s"${showApp(prettyTy)} → ${showTy(prettyBod)}"))
     }
 
-    //TODO: needs to have both the ful config and the partial config
-    def parser(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser): restParser.Parser[Arrow] = {
+    def parser(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser)(parseLessPrecidence: restParser.Parser[Exp]): restParser.Parser[Arrow] = {
       import restParser._
 
-      (parseConstruction(config.configs.toList.filter(_ != ArrowConstruction))(ctx)(config) ~ ("→" ~> subExp(ctx)(config))) ^^ { case (in ~ out) => Arrow(in, out) }
+      (parseLessPrecidence ~ ("→" ~> subExp(ctx)(config))) ^^ { case (in ~ out) => Arrow(in, out) }
     }
   }
 
-  //  case object BinderConstruction extends Construction {
-  //
-  //    case class Binder(tys: List[Exp], bod: Exp)
-  //
-  //    override type Constructed = Binder
-  //
-  //    def toExp(b: Binder): Exp = b match {
-  //      case Binder(List(), bod)       => bod
-  //      case Binder(head :: tail, bod) => Pi(head, toExp(Binder(tail, bod)).open())
-  //    }
-  //
-  //    def fromExp(e: Exp): Option[Constructed] = Some(e match {
-  //      case Pi(ty, bod) if  => Some(Arrow(ty, bod.sub(Var(0))))
-  //      case exp => Binder(List(), exp)
-  //    })
-  //
-  //    def pettyPrint(c: Binder, ctx: PrintCtx, p: Printer)(config: ConstructionsConfig): (Set[String], PartialOutput) = ???
-  //    //    {
-  //    //      //The best pretty printer would accumulate all the arrows... and then make at the end
-  //    //      val Arrow(ty, bod) = c
-  //    //      val (vars1, prettyTy) = p(ty, ctx)(config)
-  //    //      val (vars2, prettyBod) = p(bod, (vars1, ctx._2))(config)
-  //    //
-  //    //      (vars2, AppList(s"${showApp(prettyTy)} → ${showTy(prettyBod)}"))
-  //    //    }
-  //
-  //  }
-
   case object ProdConstruction extends Construction {
 
+    object Prod {
+      def unapplySeq(e: Exp): Option[Seq[Exp]] = fromExp(e).map(_.ls)
+    }
     case class Prod(ls: Exp*) //{ require(!ls.isEmpty, "so it doesn't override unit") }
 
     override type Constructed = Prod
@@ -113,16 +101,15 @@ object Constructions { //TODO: paramiterixe these over generalized epressions?  
       e match {
         case Pi(Prop(), Pi(bod, Var(1))) => {
 
-          def extract(e: Exp)(v: Var): Option[List[Exp]] = ArrowConstruction.fromExp(e) match {
-            case Some(ArrowConstruction.Arrow(from, to)) if !freeVars(from).contains(v) => for { ls <- extract(to)(v) } yield from.sub(Var(0)) :: ls
-            case None if e == v => Some(List())
-            case None if e != v => None
+          import ArrowConstruction.Arrow
+
+          def extract(e: Exp)(v: Var): Option[List[Exp]] = e match {
+            case Arrow(from, to) if !from.freeVars.contains(v) => for { ls <- extract(to)(v) } yield from.sub(Var(0)) :: ls
+            case _ if e == v                                   => Some(List())
+            case _ if e != v                                   => None
           }
 
-          extract(bod)(Var(0)) match {
-            case Some(ls) => Some(Prod((ls.toSeq): _*))
-            case None     => None
-          }
+          extract(bod)(Var(0)).map(ls => Prod((ls.toSeq): _*))
         }
         case _ => None
       }
@@ -141,46 +128,16 @@ object Constructions { //TODO: paramiterixe these over generalized epressions?  
       (tempctx._1, AppList(outseq.mkString(" × ")))
     }
 
-    def parser(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser): restParser.Parser[Prod] = {
+    def parser(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser)(parseLessPrecidence: restParser.Parser[Exp]): restParser.Parser[Prod] = {
       import restParser._
 
-      def subProd(ctx: List[String])(config: ConstructionsConfig): Parser[List[Exp]] = ???
-
-      //      (subExp(ctx)(config) ~ ("→" ~> subExp(ctx)(config))) ^^ { case (in ~ out) => Arrow(in, out) }
-
-      ???
+      (parseLessPrecidence) ~ ("×" ~> parseLessPrecidence).+ ^^ { case head ~ tail => Prod((head :: tail): _*) }
     }
 
-    //
-
-    //    def form(ty: Exp, bod: Exp) = Arrow
-
-    //  def Parse: ((c: _1.Product)String) forSome { val _1: cc_with_constructions.Constructions.PruductConstruction } = ???
-    //    def form(se: Seq[cc.Cc.Exp]): cc_with_constructions.Constructions.PruductConstruction#Product = ???
-    //    def fromExp(e: cc.Cc.Exp): Option[cc_with_constructions.Constructions.PruductConstruction#Product] = ???
-    //  def pettyPrint: ((c: _1.Product)String) forSome { val _1: cc_with_constructions.Constructions.PruductConstruction } = ???
-    //  def toExp: ((c: _1.Product)cc.Cc.Exp) forSome { val _1: cc_with_constructions.Constructions.PruductConstruction } = ???
+    //TODO: also intro and elim constructions?
   }
 
-  //  case object PruductConstruction extends Construction {
-  //
-  //    case class Product(ls: List[Exp])
-  //
-  //    override type Constructed = Product
-  //
-  //    def toExp(prod: Product): Exp = {
-  //
-  //      ???
-  //    }
-  //
-  //    //  def Parse: ((c: _1.Product)String) forSome { val _1: cc_with_constructions.Constructions.PruductConstruction } = ???
-  //    //    def form(se: Seq[cc.Cc.Exp]): cc_with_constructions.Constructions.PruductConstruction#Product = ???
-  //    //    def fromExp(e: cc.Cc.Exp): Option[cc_with_constructions.Constructions.PruductConstruction#Product] = ???
-  //    //  def pettyPrint: ((c: _1.Product)String) forSome { val _1: cc_with_constructions.Constructions.PruductConstruction } = ???
-  //    //  def toExp: ((c: _1.Product)cc.Cc.Exp) forSome { val _1: cc_with_constructions.Constructions.PruductConstruction } = ???
-  //  }
-
-  //TODO: neg, bot, nproducts, nsum, eq, church bools, church num, ...
+  //TODO: bot, neg, nproducts, nsum, eq, church bools, church num, ...
 
   //how to deal with "implicit" type level information
 

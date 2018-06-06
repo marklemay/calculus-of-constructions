@@ -5,7 +5,6 @@ import cc.CcProperties.Appls
 
 object CcPrettyPrinter {
   //TODO: this is a bit of a mess
-  //TODO: should be more sparing with the brackets
   //TODO: can give vars better names if they have atomic type
 
   sealed trait PartialOutput {
@@ -43,10 +42,10 @@ object CcPrettyPrinter {
     case Typ()                      => (allVars, Atom(s"□"))
 
     case Var(i) if i < nameCtx.size => (allVars, Atom(nameCtx(i)))
-    case Var(i)                     => (allVars, Atom(s"$i?"))
+    case Var(i)                     => (allVars, Atom(s"${i - nameCtx.size}?"))
 
     case Lam(ty, bod) => {
-      val newvar = freshVar(allVars)
+      val newvar = freshVar(allVars, nameCtx, ty)
       val vars1 = allVars + newvar
 
       val (vars2, prettyTy) = Printer(ty, vars1, nameCtx)
@@ -56,7 +55,7 @@ object CcPrettyPrinter {
     }
 
     case Pi(ty, bod) => {
-      val newvar = freshVar(allVars)
+      val newvar = freshVar(allVars, nameCtx, ty)
       val vars1 = allVars + newvar
 
       val (vars2, prettyTy) = Printer(ty, vars1, nameCtx)
@@ -75,6 +74,25 @@ object CcPrettyPrinter {
       }
 
       (temp, AppList(out.map(showApp).mkString(" ")))
+    }
+  }
+
+  def freshVar(printCtx: Set[String], nameCtx: List[String], ty: Exp): String = ty match {
+    case Var(v) if v < nameCtx.size => freshVar(printCtx, nameCtx(v))
+    case _                          => freshVar(printCtx)
+  }
+
+  def freshVar(printCtx: Set[String], tyName: String): String = {
+    val base = tyName.toLowerCase()
+
+    if (!printCtx.contains(base.toString())) {
+      base
+    } else {
+      var tmp = 1
+      while (printCtx.contains(base + tmp)) {
+        tmp += 1
+      }
+      base + tmp
     }
   }
 

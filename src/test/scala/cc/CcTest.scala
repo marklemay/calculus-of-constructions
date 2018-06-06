@@ -1,11 +1,9 @@
 package cc
 
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import cc.CcParser._
 
 import CcProperties._
-//import cc
 
 class CcTest {
   @Test
@@ -30,6 +28,6 @@ class CcTest {
   def smallstepMatchesBigStepTests {
     val e = cc"λ A : ● . λ B : □ . (● ([λ C : □ . □] □))"
 
-    assert(e.norm == smallStep(e))
+    assert(e.norm == e.smallStep)
   }
 }

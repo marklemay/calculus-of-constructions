@@ -4,6 +4,16 @@ import cc.Cc._
 import cc.CcProperties.Appls
 import cc_with_constructions.ConstructionsConfig
 
+import cc.CcPrettyPrinter.PartialOutput
+import cc.CcPrettyPrinter.Atom
+import cc.CcPrettyPrinter.AppList
+import cc.CcPrettyPrinter.Outer
+
+import cc.CcPrettyPrinter.showTy
+import cc.CcPrettyPrinter.showBod
+import cc.CcPrettyPrinter.showApp
+
+import cc.CcPrettyPrinter.freshVar
 
 //TOOD: index the whole class by the configuration?
 object CcConstructionsPrettyPrinter {
@@ -32,7 +42,7 @@ object CcConstructionsPrettyPrinter {
       case Var(i)                     => (allVars, Atom(s"$i?"))
 
       case Lam(ty, bod) => {
-        val newvar = freshVar(allVars)
+        val newvar = freshVar(allVars, nameCtx, ty)
         val vars1 = allVars + newvar
 
         val (vars2, prettyTy) = printer(ty, vars1, nameCtx)(config)
@@ -42,7 +52,7 @@ object CcConstructionsPrettyPrinter {
       }
 
       case Pi(ty, bod) => {
-        val newvar = freshVar(allVars)
+        val newvar = freshVar(allVars, nameCtx, ty)
         val vars1 = allVars + newvar
 
         val (vars2, prettyTy) = printer(ty, vars1, nameCtx)(config)
@@ -62,60 +72,6 @@ object CcConstructionsPrettyPrinter {
 
         (temp, AppList(out.map(showApp).mkString(" ")))
       }
-    }
-  }
-
-  //TODO: import these
-  sealed trait PartialOutput {
-    val s: String
-  }
-
-  //todo: add meta data?
-  case class Atom(s: String) extends PartialOutput
-  case class AppList(s: String) extends PartialOutput
-  case class Outer(s: String) extends PartialOutput
-
-  //TODO: put in class
-  def showTy(out: PartialOutput): String = out match {
-    case Atom(s)    => s"$s"
-    case Outer(s)   => s"[$s]"
-    case AppList(s) => s"$s"
-  }
-
-  def showBod(out: PartialOutput): String = out match {
-    case Atom(s)    => s"$s"
-    case Outer(s)   => s"$s"
-    case AppList(s) => s"($s)"
-  }
-
-  def showApp(out: PartialOutput): String = out match {
-    case Atom(s)    => s"$s"
-    case Outer(s)   => s"[$s]"
-    case AppList(s) => s"($s)"
-  }
-
-  def freshVar(printCtx: Set[String]): String = {
-    var tmp = 'A'
-
-    while (printCtx.contains(tmp.toString())) {
-      tmp = (tmp.toInt + 1).toChar
-    }
-    tmp.toString()
-  }
-
-  def freshVarFromType(printCtx: Set[String], ty: String): String = {
-    val base = ty.toLowerCase()
-
-    if (!printCtx.contains(base)) {
-      base
-    } else {
-
-      var tmp = 1
-
-      while (printCtx.contains(base + tmp.toString())) {
-        tmp += 1
-      }
-      base + tmp.toString()
     }
   }
 

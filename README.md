@@ -1,7 +1,7 @@
 # calculus-of-constructions
-a simple implementation of the pure calculus of constructions
+a simple reference implementation of the pure calculus of constructions
 
- * seperated into 2 parts...
+Start by reviewing the example proofs.  Then review Cc.scala to see a minimal implementation of the calculus of constructions.
 
 ## insights after implementing these things a lot
  * KISS
@@ -30,11 +30,11 @@ a simple implementation of the pure calculus of constructions
  * proof search
 
 ## TODO
+ * review the normalization proof in the off chance it comes up "A short and flexible proof of Strong Normalization for the Calculus of Constructions"
  * rename everything
  * correct spelling
  * add scala docs
  * clean up pom
- * parser more efficient
  * implicitly index everything by constructions
  * CI
  * TESTs

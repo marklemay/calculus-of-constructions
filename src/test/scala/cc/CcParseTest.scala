@@ -1,11 +1,8 @@
 package cc
 
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import cc.CcParser._
 import cc.Cc._
-
-//import cc
 
 class CcParseTest {
   @Test

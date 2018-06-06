@@ -33,7 +33,7 @@ object CcParser extends CcParser {
 
   def parse(s: String): ParseResult[Exp] = parse(apps(List()), s)
 
-  implicit class SimpleCCParserHelper(val sc: StringContext) extends AnyVal {
+  implicit class CcParserHelper(val sc: StringContext) extends AnyVal {
     def cc(args: Any*): Exp = parse(sc.standardInterpolator({ x => x }, args)) match {
       case Success(matched, _) => matched //TODO: if "" is empty
       //      case Failure(msg, _)     => println("FAILURE: " + msg)

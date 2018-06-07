@@ -34,7 +34,6 @@ class ExampleProofTest {
     val thrm = ccc"Π A : ● . A → (A × A)"
 
     val proof = ccc"λ A : ● . λ a : A . λ OUT : ● . λ f : [A → A → OUT] . f a a"
-    //    val proof = ccc"λ A : ● . λ a : A . λ OUT : ● . λ f : [A → A → OUT] . f a a" TODO: fix parser
 
     assert(proof.ty().get == thrm)
   }
@@ -71,5 +70,6 @@ class ExampleProofTest {
   //TOOD: the properties of sum types
   //TOOD: forall A, not (not (Lem A))
   //TOOD:  Eq refl, Eq symetric, Eq commutative, Eq allows replacement, Eq transitive,
+  //TODO: for all A : ● , not ( A = not A)
 
 }

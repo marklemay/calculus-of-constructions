@@ -67,6 +67,20 @@ class ExampleProofTest {
     assert(proof.ty().get == thrm)
   }
 
+  @Test
+  def prod_comm {
+    val thrm = ccc"Π A : ● . Π B : ● . A × B → B × A"
+    val proof = ccc"λ A : ● . λ B : ● . λ p : A × B . λ OUT : ● . λ f : B → A → OUT . f (p B (λ _ : A . λ b : B . b)) (p A (λ a : A . λ _ : B . a))"
+    assertEquals(thrm, proof.ty().get)
+  }
+
+  @Test
+  def prod_assoc {
+    val thrm = ccc"Π A : ● . Π B : ● . Π C : ● . A × B × C → (A × B) × C"
+    val proof = ccc"λ A : ● . λ B : ● . λ C : ● . λ p : A × B × C . λ OUT : ● . λ f : A × B → C → OUT . f (λ OUT0 : ● . λ f0 : A → B → OUT0 . f0 (p A (λ a : A . λ _ : B × C . a)) (p (B × C) (λ _ : A . λ b : B × C . b) B (λ a : B . λ _ : C . a))) (p (B × C) (λ _ : A . λ b : B × C . b) C (λ _ : B . λ b : C . b))"
+    assertEquals(thrm, proof.ty().get)
+  }
+
   //TOOD: the properties of sum types
   //TOOD: forall A, not (not (Lem A))
   //TOOD:  Eq refl, Eq symetric, Eq commutative, Eq allows replacement, Eq transitive,

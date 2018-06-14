@@ -27,15 +27,20 @@ class CcParser extends RegexParsers {
 
   def exp(ctx: List[String]): Parser[Exp] = prop | typ | variable(ctx) | lam(ctx) | pi(ctx) | "(" ~> apps(ctx) <~ ")" | "[" ~> exp(ctx) <~ "]"
 
+  def totalParse = apps(List()) <~ """\s*""".r
+
 }
 
 object CcParser extends CcParser {
 
-  def parse(s: String): ParseResult[Exp] = parse(apps(List()), s)
+  def parse(s: String): ParseResult[Exp] = parse(totalParse, s)
 
   implicit class CcParserHelper(val sc: StringContext) extends AnyVal {
     def cc(args: Any*): Exp = parse(sc.standardInterpolator({ x => x }, args)) match {
-      case Success(matched, _) => matched //TODO: if "" is empty
+      case Success(matched, rest) if rest.atEnd => matched
+      case Success(matched, rest) => {
+        scala.sys.error("error in the code starting at:\r\n" + rest.pos.longString)
+      }
       //      case Failure(msg, _)     => println("FAILURE: " + msg)
       //      case Error(msg, _)       => println("ERROR: " + msg)
     }

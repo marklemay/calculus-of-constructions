@@ -23,6 +23,7 @@ class CcConstructionsParser extends RegexParsers {
   def pi(ctx: List[String])(config: ConstructionsConfig): Parser[Pi] = (("Π" ~> varName <~ ":") >> { v => subExp(ctx)(config) ~ scope(v, ctx)(config) }) ^^
     { case ty ~ bod => Pi(ty, bod) }
 
+  //TODO: there should be a better way to propogate errors here
   def apps(ctx: List[String])(config: ConstructionsConfig): Parser[Exp] = (exp(ctx)(config) ~ (exp(ctx)(config) *)) ^^
     { case head ~ rest => rest.foldLeft[Exp](head)(App) }
 
@@ -35,15 +36,20 @@ class CcConstructionsParser extends RegexParsers {
 
   def exp(ctx: List[String])(config: ConstructionsConfig): Parser[Exp] = prop | typ | variable(ctx) | lam(ctx)(config) | pi(ctx)(config) | "(" ~> subExp(ctx)(config) <~ ")" | "[" ~> subExp(ctx)(config) <~ "]"
 
+  def totalParse(config: ConstructionsConfig) = subExp(List())(config) <~ """\s*""".r
+  
 }
 
 object CcConstructionsParser extends CcConstructionsParser {
 
-  def parse(s: String)(config: ConstructionsConfig): ParseResult[Exp] = parse(subExp(List())(config), s)
+  def parse(s: String)(config: ConstructionsConfig): ParseResult[Exp] = parse(totalParse(config), s)
 
   implicit class CcConstructionsParserHelper(val sc: StringContext) extends AnyVal {
     def ccc(args: Any*)(implicit config: ConstructionsConfig = ConstructionsConfig()): Exp = parse(sc.standardInterpolator({ x => x }, args))(config) match {
-      case Success(matched, _) => matched //TODO: if "" is empty
+      case Success(matched, rest) if rest.atEnd => matched
+      case Success(matched, rest)               => {
+        scala.sys.error("error in the code starting at:\r\n"+rest.pos.longString)
+      }
       //      case Failure(msg, _)     => println("FAILURE: " + msg)
       //      case Error(msg, _)       => println("ERROR: " + msg)
     }

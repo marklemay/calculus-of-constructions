@@ -78,6 +78,30 @@ object CcProperties {
 
       case App(f, a)    => s"Pi(${f.toScala}, ${a.toScala})"
     }
+
+    //TODO: implicit interpertation of prop, type and Pi?
+    //TODO: better error reporting?
+    //TODO: allow constuctions to have a natural scala interpertation
+    /** a cheesy way to turn a syntacitc term into a runnable Scala function */
+    def asObject[O]: O = {
+
+      def rec(e: Exp, ctx: List[Any]): Any = e match {
+        case Prop()      => ???
+        case Typ()       => ???
+        case Pi(ty, bod) => ???
+        
+        case Var(i)      => ctx(i)
+
+        case Lam(_, bod) => { x: Any => rec(bod, x :: ctx) }
+
+        case App(f, a) => {
+          val ff = rec(f, ctx).asInstanceOf[Any => Any]
+          ff(rec(a, ctx))
+        }
+      }
+
+      rec(exp, List()).asInstanceOf[O]
+    }
   }
 
   object Appls {

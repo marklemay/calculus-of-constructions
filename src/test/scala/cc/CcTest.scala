@@ -30,4 +30,26 @@ class CcTest {
 
     assert(e.norm == e.smallStep)
   }
+
+  @Test
+  def ccAsScalaObject {
+
+    val e = cc"λ A : ● . A".asObject[Int => Int]
+
+    assert(e(3) == 3)
+    assert(e(3) != 4)
+
+    val polyId = cc"λ A : ● . λ a : A . a".asObject[Any => (Int => Int)]
+
+    assert(polyId("whatever")(3) == 3)
+    assert(polyId("whatever")(3) != 4)
+
+    val functionApp1 = cc"λ A : ● . λ f : [Πa:A. A] .  λ a : A . (f a) ".asObject[Any => (Int => Int) => (Int => Int)]
+
+    assert(functionApp1("whatever") { x: Int => x * x }(3) == 9)
+
+    val functionApp2 = cc"λ A : ● . λ f : [Πa:A. A] .  λ a : A . (f (f a)) ".asObject[Any => (Int => Int) => (Int => Int)]
+
+    assert(functionApp2("whatever") { x: Int => x * x }(3) == 81)
+  }
 }

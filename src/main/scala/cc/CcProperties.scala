@@ -102,6 +102,8 @@ object CcProperties {
 
       rec(exp, List()).asInstanceOf[O]
     }
+    
+    //TODO: another nice exercise would be to write an eta normal form
   }
 
   object Appls {

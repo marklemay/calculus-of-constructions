@@ -5,6 +5,12 @@ Start by reviewing the [example proofs](src/test/scala/cc/ExampleProofTest.scala
 
 There is a system to extend the base language with "constructions" so that common abbreviations can be used in the language interface.  They don't change the expressive power of the underlying theory at all, but make expressions much easier to read and write.  It's still a little half baked but you can see it implemented in [Constructions.scala](src/main/scala/cc_with_constructions/Constructions.scala)
 
+## Build instructions
+
+The build uses [sbt](https://www.scala-sbt.org/).
+
+Running `sbt test` will download all dependencies, compile everything, and run all tests.
+
 ## What I learned after a few implementations
  * KISS
    * use a datatype that expresses the core AST (or ABT)

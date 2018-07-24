@@ -47,11 +47,10 @@ Running `sbt test` will download all dependencies, compile everything, and run a
  * clean up pom
  * implicitly index everything by constructions
  * CI
- * TESTs
  * there is much more information that could be included in the quick check tests
    * lots of redundant checks with the default generator
    * can shrink in a binding aware way
-   *could generate closed expressions
+   * could generate closed expressions
    * could even generate well typed expressions (sort of)
    * tinycheck would be better for this, but noones built it in scala yet?
  * possible to abstract away the details of variables?

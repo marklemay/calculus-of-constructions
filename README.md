@@ -1,5 +1,6 @@
 # calculus-of-constructions
 [![Build Status](https://travis-ci.com/marklemay/calculus-of-constructions.svg?branch=master)](https://travis-ci.com/marklemay/calculus-of-constructions)
+
 A simple reference implementation of the pure calculus of constructions
 
 Start by reviewing the [example proofs](src/test/scala/cc/ExampleProofTest.scala).  Then review [Cc.scala](src/main/scala/cc/Cc.scala) to see a minimal implementation of the calculus of constructions.

@@ -3,6 +3,7 @@ package cc
 import scala.util.parsing.combinator._
 import cc.Cc._
 import scala.annotation.migration
+import scala.language.postfixOps
 
 class CcParser extends RegexParsers {
   def prop: Parser[Prop] = "●" ^^^ Prop()

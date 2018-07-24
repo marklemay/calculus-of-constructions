@@ -46,7 +46,6 @@ Running `sbt test` will download all dependencies, compile everything, and run a
  * add Scala docs
  * clean up pom
  * implicitly index everything by constructions
- * CI
  * there is much more information that could be included in the quick check tests
    * lots of redundant checks with the default generator
    * can shrink in a binding aware way

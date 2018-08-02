@@ -64,6 +64,11 @@ object CcProperties {
       case App(f, a)           => f.isValue && a.isValue
     }
 
+    def isType: Boolean = exp.ty(List()) match {
+      case Some(x) => x.isSort
+      case None    => false
+    }
+
     //can't do anything cleaner with toString
     def show(implicit config: ConstructionsConfig = ConstructionsConfig()): String = CcConstructionsPrettyPrinter.printer(exp, Set(), List())(config)._2.s
 
@@ -89,7 +94,7 @@ object CcProperties {
         case Prop()      => ???
         case Typ()       => ???
         case Pi(ty, bod) => ???
-        
+
         case Var(i)      => ctx(i)
 
         case Lam(_, bod) => { x: Any => rec(bod, x :: ctx) }
@@ -102,7 +107,7 @@ object CcProperties {
 
       rec(exp, List()).asInstanceOf[O]
     }
-    
+
     //TODO: another nice exercise would be to write an eta normal form
   }
 

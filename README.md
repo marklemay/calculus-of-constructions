@@ -3,7 +3,7 @@
 
 A simple reference implementation of the pure Calculus of Constructions in Scala.
 
-You can find the basic rules for Calculus of Constructions on [nLab](https://ncatlab.org/nlab/show/pure+type+system) and some intresting constructions on [wikipedia](https://en.wikipedia.org/wiki/Calculus_of_constructions#Defining_logical_operators)
+You can find the basic rules for Calculus of Constructions on [nLab](https://ncatlab.org/nlab/show/pure+type+system) and some interesting constructions on [wikipedia](https://en.wikipedia.org/wiki/Calculus_of_constructions#Defining_logical_operators)
 
 Start by reviewing the [example proofs](src/test/scala/cc/ExampleProofTest.scala).  Then review [Cc.scala](src/main/scala/cc/Cc.scala) to see a minimal implementation of the calculus of constructions.
 

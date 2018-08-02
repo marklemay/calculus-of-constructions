@@ -69,7 +69,11 @@ object CcSpec extends Properties("CcSpec") {
     for (_ <- 0.until(100)) {
       temp = temp.smallStep
     }
-    Some(temp)
+    if (temp.isValue) {
+      Some(temp)
+    } else {
+      None
+    }
   }
 
 }

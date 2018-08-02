@@ -20,7 +20,7 @@ object CcSpec extends Properties("CcSpec") {
 
   def genVar: Gen[Var] = {
     for {
-      i <- Gen.choose(0, 100)
+      i <- Gen.choose(0, 10)
     } yield Var(i)
   }
 
@@ -63,7 +63,8 @@ object CcSpec extends Properties("CcSpec") {
   }
 
   def eventuallyNormalizes(e: Exp): Boolean = eventualValue(e).isDefined
-
+  
+  //TODO: index by a rendomized number of steps
   def eventualValue(e: Exp): Option[Exp] = {
     var temp = e
     for (_ <- 0.until(100)) {

@@ -71,7 +71,6 @@ object NormalFormSpec extends Properties("NormalFormSpec.scala") {
 
   property("if it typechecks (it normalizes) then can be reduced to normal form") = forAll { e: Exp =>
     e.ty().isDefined ==> {
-      println(e)
       NormalForm.toNomal(e.norm).isDefined
     }
   }

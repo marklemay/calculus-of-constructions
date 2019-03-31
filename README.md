@@ -24,12 +24,11 @@ Running `sbt test` will download all dependencies, compile everything, and run a
  * proof search
 
 ## TODO (feel free to pull request any of these)
- * review the normalization proof in the off chance it comes up "A short and flexible proof of Strong Normalization for the Calculus of Constructions"
  * rename everything
    * package and class names 
- * correct spelling/capitalization
+   * correct spelling/capitalization
  * add Scala docs
- * clean up pom
+ * redo the pretty printing
  * implicitly index everything by constructions
  * there is much more information that could be included in the quick check tests
    * lots of redundant checks with the default generator
@@ -38,6 +37,8 @@ Running `sbt test` will download all dependencies, compile everything, and run a
    * could even generate well typed expressions (sort of)
    * tinycheck would be better for this, but noones built it in scala yet?
  * possible to abstract away the details of variables?
- * expression problem
+ * expression problem (relevent to the half baked constructions interface)
  * a web UI would be cool
  * some proof automation would be cool
+   * a minimal implementation of Doweks algoritm could be implemented with moderate effort.
+ * review the normalization proof in the off chance it comes up "A short and flexible proof of Strong Normalization for the Calculus of Constructions"

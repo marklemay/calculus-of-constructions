@@ -17,28 +17,37 @@ Running `sbt test` will download all dependencies, compile everything, and run a
 
  
 ## Not covered
- * UI
- * type inference
- * Elaboration
- * tactics
- * proof search
+* UI
+* type inference
+* Elaboration
+* tactics
+* proof search
+
+## References for implementing dependently typed languages
+* everything [Stephanie Weirich](https://www.cis.upenn.edu/~sweirich/) has ever done
+  * [Designing Dependently-Typed Programming Languages](https://www.cs.uoregon.edu/research/summerschool/summer13/curriculum.html)
+* Andrej has a zoo of functional language implementations, and a good [presentation for dependent types](http://math.andrej.com/2018/08/25/how-to-implement-type-theory-in-an-hour/) with bidirectional typechecking 
+* Bidirectional typechecking
+  * [simplest presentation](http://davidchristiansen.dk/tutorials/bidirectional.pdf)
+  * very intresting: http://semantic-domain.blogspot.com/2018/08/polarity-and-bidirectional-typechecking.html
 
 ## TODO (feel free to pull request any of these)
- * rename everything
-   * package and class names 
-   * correct spelling/capitalization
- * add Scala docs
- * redo the pretty printing
- * implicitly index everything by constructions
- * there is much more information that could be included in the quick check tests
-   * lots of redundant checks with the default generator
-   * can shrink in a binding aware way
-   * could generate closed expressions
-   * could even generate well typed expressions (sort of)
-   * tinycheck would be better for this, but noones built it in scala yet?
- * possible to abstract away the details of variables?
- * expression problem (relevent to the half baked constructions interface)
- * a web UI would be cool
- * some proof automation would be cool
-   * a minimal implementation of Doweks algoritm could be implemented with moderate effort.
- * review the normalization proof in the off chance it comes up "A short and flexible proof of Strong Normalization for the Calculus of Constructions"
+* rename everything
+  * package and class names 
+  * correct spelling/capitalization
+* add Scala docs
+* redo the pretty printing
+* make it bidirectional
+* implicitly index everything by constructions
+* there is much more information that could be included in the quick check tests
+  * lots of redundant checks with the default generator
+  * can shrink in a binding aware way
+  * could generate closed expressions
+  * could even generate well typed expressions (sort of)
+  * tinycheck would be better for this, but noones built it in scala yet?
+* possible to abstract away the details of variables?
+* expression problem (relevent to the half baked constructions interface)
+* a web UI would be cool
+* some proof automation would be cool
+  * a minimal implementation of Doweks algoritm could be implemented with moderate effort.
+* review the normalization proof in the off chance it comes up "A short and flexible proof of Strong Normalization for the Calculus of Constructions"

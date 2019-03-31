@@ -26,7 +26,7 @@ Running `sbt test` will download all dependencies, compile everything, and run a
 ## References for implementing dependently typed languages
 * everything [Stephanie Weirich](https://www.cis.upenn.edu/~sweirich/) has ever done
   * [Designing Dependently-Typed Programming Languages](https://www.cs.uoregon.edu/research/summerschool/summer13/curriculum.html)
-* Andrej has a zoo of functional language implementations, and a good [presentation for dependent types](http://math.andrej.com/2018/08/25/how-to-implement-type-theory-in-an-hour/) with bidirectional typechecking 
+* Andrej has a [zoo](http://plzoo.andrej.com/) of functional language implementations, and a good [presentation for dependent types](http://math.andrej.com/2018/08/25/how-to-implement-type-theory-in-an-hour/) with bidirectional typechecking 
 * Bidirectional typechecking
   * [simplest presentation](http://davidchristiansen.dk/tutorials/bidirectional.pdf)
   * very intresting: http://semantic-domain.blogspot.com/2018/08/polarity-and-bidirectional-typechecking.html

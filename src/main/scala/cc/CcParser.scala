@@ -9,7 +9,7 @@ class CcParser extends RegexParsers {
   def prop: Parser[Prop] = "●" ^^^ Prop()
   def typ: Parser[Typ] = "□" ^^^ Typ()
 
-  def varName: Parser[String] = """[a-z|A-Z]+""".r
+  def varName: Parser[String] = """[a-z|A-Z|_][a-z|A-Z|0-9|'|_]*""".r
 
   def variable(ctx: List[String]): Parser[Var] = varName ^? (
     { case name if ctx.contains(name) => Var(ctx.indexOf(name)) },
@@ -37,7 +37,8 @@ object CcParser extends CcParser {
   def parse(s: String): ParseResult[Exp] = parse(totalParse, s)
 
   implicit class CcParserHelper(val sc: StringContext) extends AnyVal {
-    def cc(args: Any*): Exp = parse(sc.standardInterpolator({ x => x }, args)) match {
+    //    def cc(args: Any*): Exp = parse(sc.standardInterpolator({ x => "( " ++ x ++ " )" }, args)) match {
+    def cc(args: Any*): Exp = parse(sc.standardInterpolator({ x => x }, args.map(x => "( " ++ x.toString() ++ " )"))) match {
       case Success(matched, rest) if rest.atEnd => matched
       case Success(matched, rest) => {
         scala.sys.error("error in the code starting at:\r\n" + rest.pos.longString)

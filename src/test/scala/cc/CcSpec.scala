@@ -28,26 +28,20 @@ object CcSpec extends Properties("CcSpec") {
 
   implicit val arbVar: Arbitrary[Var] = Arbitrary(genVar)
 
-  property("typcheck normalizes to the same type") = forAll { e: Exp =>
-    e.ty().isDefined ==> {
-      e.ty().get == e.norm.ty().get
+  property("small step respects free vars") = forAll { (e: Exp) =>
+    e.smallStep.freeVars.subsetOf(e.freeVars)
+  }
+
+  property("normalization respects free vars") = forAll { (e: Exp) =>
+    eventuallyNormalizes(e) ==> {
+      e.norm.freeVars.subsetOf(e.freeVars)
     }
   }
 
-  property("small step and big step match") = forAll { e: Exp =>
+  property("repeated small step and big step match") = forAll { e: Exp =>
     eventuallyNormalizes(e) ==> {
       e.norm == eventualValue(e).get
     }
-  }
-
-  property("small step preserves type") = forAll { e: Exp =>
-    e.ty().isDefined ==> {
-      e.ty() == e.smallStep.ty()
-    }
-  }
-
-  property("sub is equivelent to replaceVar @ Var(0) after eating the free var") = forAll { (e: Exp, withThis: Exp) =>
-    e.sub(withThis) == e.replaceVar(Var(0), withThis.open()).sub(Var(0))
   }
 
   property("sub expression normalize consistently (church-rosser)") = forAll { (e: Exp, sube: Exp) =>
@@ -62,8 +56,23 @@ object CcSpec extends Properties("CcSpec") {
     }
   }
 
+  property("small step preserves type") = forAll { e: Exp =>
+    e.ty().isDefined ==> {
+      e.ty() == e.smallStep.ty()
+    }
+  }
+  property("typcheck normalizes to the same type") = forAll { e: Exp =>
+    e.ty().isDefined ==> {
+      e.ty().get == e.norm.ty().get
+    }
+  }
+
+  property("sub is equivelent to replaceVar @ Var(0) after eating the free var") = forAll { (e: Exp, withThis: Exp) =>
+    e.sub(withThis) == e.replaceVar(Var(0), withThis.open()).sub(Var(0))
+  }
+
   def eventuallyNormalizes(e: Exp): Boolean = eventualValue(e).isDefined
-  
+
   //TODO: index by a rendomized number of steps
   def eventualValue(e: Exp): Option[Exp] = {
     var temp = e

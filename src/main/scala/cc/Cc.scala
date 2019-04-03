@@ -92,6 +92,8 @@ object Cc {
       case _ => None
     }
 
+    lazy val t: Exp = ty(List()).get //cheat a little for today
+
     override def toString(): String = CcPrettyPrinter.Printer(this, Set(), List())._2.s
   }
 

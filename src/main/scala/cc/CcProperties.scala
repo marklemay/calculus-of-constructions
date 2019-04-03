@@ -84,6 +84,7 @@ object CcProperties {
       case App(f, a)    => s"Pi(${f.toScala}, ${a.toScala})"
     }
 
+    // TODO: should be coerce as lazily as possible to avoid having to deal with term irelevent things
     //TODO: implicit interpertation of prop, type and Pi?
     //TODO: better error reporting?
     //TODO: allow constuctions to have a natural scala interpertation

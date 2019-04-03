@@ -1,12 +1,119 @@
 package cc
 
 import cc.Cc._
+import CcProperties._
 import cc.CcProperties.Appls
 
 object CcPrettyPrinter {
+
+  def paren(outer: Int)(inner: Int)(s: String) = if (outer < inner) { "(" ++ s ++ ")" } else s
+
+  //TODO: rewrite monadicly
+
+  def prettyShow(e: Exp)(i: Int)(allVars: Set[String])(nameCtx: List[String]): (Set[String], String) = e match {
+    case Prop()                     => (allVars, s"●")
+    case Typ()                      => (allVars, s"□")
+    case Var(i) if i < nameCtx.size => (allVars, nameCtx(i))
+    case Var(i)                     => (allVars, (i - nameCtx.size).toString() ++ "?")
+
+    case App(f, a) => {
+      val (allVars2, fs) = prettyShow(f)(1)(allVars)(nameCtx)
+      val (allVars3, as) = prettyShow(a)(0)(allVars)(nameCtx)
+      (allVars3, paren(i)(1)(s"$fs $as"))
+    }
+    case Lam(t, bod) => {
+
+      val x = if (bod.freeVars.contains(Var(0))) {
+        freshVar(allVars, nameCtx, t)
+      } else {
+        "_"
+      }
+
+      val allVars2 = (allVars ++ Set(x))
+
+      val (allVars3, ts) = prettyShow(t)(4)(allVars2)(nameCtx)
+
+      val (allVars4, bods) = prettyShow(bod)(5)(allVars2)(x :: nameCtx)
+      (allVars4, paren(i)(5)(s"λ $x : $ts . $bods"))
+    }
+    case Pi(t, bod) => {
+
+      if (bod.freeVars.contains(Var(0))) {
+        val x = freshVar(allVars, nameCtx, t)
+
+        val allVars2 = (allVars ++ Set(x))
+
+        val (allVars3, ts) = prettyShow(t)(4)(allVars2)(nameCtx)
+
+        val (allVars4, bods) = prettyShow(bod)(5)(allVars2)(x :: nameCtx)
+        (allVars4, paren(i)(5)(s"Π $x : $ts . $bods"))
+      } else {
+        val x = "_"
+        val allVars2 = (allVars ++ Set(x))
+
+        val (allVars3, ts) = prettyShow(t)(2)(allVars2)(nameCtx)
+
+        val (allVars4, bods) = prettyShow(bod)(3)(allVars2)(x :: nameCtx)
+        (allVars4, paren(i)(3)(s"$ts → $bods"))
+      }
+
+    }
+  }
+
+  def showFullyParen(e: Exp)(allVars: Set[String])(nameCtx: List[String]): (Set[String], String) = e match {
+    case Prop()                     => (allVars, s"●")
+    case Typ()                      => (allVars, s"□")
+    case Var(i) if i < nameCtx.size => (allVars, nameCtx(i))
+    case Var(i)                     => (allVars, (i - nameCtx.size).toString() ++ "?")
+
+    case App(f, a) => {
+      val (allVars2, fs) = showFullyParen(f)(allVars)(nameCtx)
+      val (allVars3, as) = showFullyParen(a)(allVars)(nameCtx)
+      (allVars3, (s"($fs $as)"))
+    }
+    case Lam(t, bod) => {
+
+      val x = if (bod.freeVars.contains(Var(0))) {
+        freshVar(allVars, nameCtx, t)
+      } else {
+        "_"
+      }
+
+      val allVars2 = (allVars ++ Set(x))
+
+      val (allVars3, ts) = showFullyParen(t)(allVars2)(nameCtx)
+
+      val (allVars4, bods) = showFullyParen(bod)(allVars2)(x :: nameCtx)
+      (allVars4, (s"(λ $x : $ts . $bods)"))
+    }
+    case Pi(t, bod) => {
+
+      if (bod.freeVars.contains(Var(0))) {
+        val x = freshVar(allVars, nameCtx, t)
+
+        val allVars2 = (allVars ++ Set(x))
+
+        val (allVars3, ts) = showFullyParen(t)(allVars2)(nameCtx)
+
+        val (allVars4, bods) = showFullyParen(bod)(allVars2)(x :: nameCtx)
+        (allVars4, (s"(Π $x : $ts . $bods)"))
+      } else {
+        val x = "_"
+        val allVars2 = (allVars ++ Set(x))
+
+        val (allVars3, ts) = showFullyParen(t)(allVars2)(nameCtx)
+
+        val (allVars4, bods) = showFullyParen(bod)(allVars2)(x :: nameCtx)
+        (allVars4, (s"($ts → $bods)"))
+      }
+
+    }
+  }
+
+  // ignore bellow
+
   //TODO: this is a bit of a mess
   //TODO: can give vars better names if they have atomic type
-
   sealed trait PartialOutput {
     val s: String
   }
@@ -77,6 +184,7 @@ object CcPrettyPrinter {
     }
   }
 
+  // rename: freshname TODO: also monadic
   def freshVar(printCtx: Set[String], nameCtx: List[String], ty: Exp): String = ty match {
     case Var(v) if v < nameCtx.size => freshVar(printCtx, nameCtx(v))
     case _                          => freshVar(printCtx)
@@ -97,13 +205,11 @@ object CcPrettyPrinter {
   }
 
   def freshVar(printCtx: Set[String]): String = {
-    var tmp = 'A'
 
-    while (printCtx.contains(tmp.toString())) {
-      tmp = (tmp.toInt + 1).toChar
-    }
-    tmp.toString()
+    freeVars.filter(!printCtx.contains(_)).head
   }
+
+  val freeVars: Stream[String] = ('A' to 'Z').map(_.toString()).toStream append freeVars.map(_ ++ "'")
 
   def freshVarFromType(printCtx: Set[String], ty: String): String = {
     val base = ty.toLowerCase()

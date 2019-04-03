@@ -67,6 +67,14 @@ object Cc {
       case Var(v) if v < ctx.size => Some(ctx(v))
       case Prop()                 => Some(Typ())
 
+      case Pi(aty, bod) => for {
+        aTyTy <- aty.ty(ctx)
+        if aTyTy.isSort
+        bodTy <- bod.ty((aty :: ctx).map(_.open()))
+        if bodTy.isSort
+      } yield bodTy
+
+      
       case Lam(aty, bod) => for {
         aTyTy <- aty.ty(ctx)
         if aTyTy.isSort
@@ -75,13 +83,6 @@ object Cc {
         fullTyTy <- fullTy.ty(ctx)
         if fullTyTy.isSort
       } yield fullTy
-
-      case Pi(aty, bod) => for {
-        aTyTy <- aty.ty(ctx)
-        if aTyTy.isSort
-        bodTy <- bod.ty((aty :: ctx).map(_.open()))
-        if bodTy.isSort
-      } yield bodTy
 
       case App(f, a) => for {
         Pi(aTy1, bodTy) <- f.ty(ctx).map(_.norm) //TODO: break to cleaner multi line?
@@ -94,7 +95,8 @@ object Cc {
 
     lazy val t: Exp = ty(List()).get //cheat a little for today
 
-    override def toString(): String = CcPrettyPrinter.Printer(this, Set(), List())._2.s
+    override def toString(): String = CcPrettyPrinter.prettyShow(this)(100)(Set())(List())._2
+//        override def toString(): String = CcPrettyPrinter.Printer(this, Set(), List())._2.s // old pretty printer
   }
 
 }

@@ -47,36 +47,7 @@ class CcParser extends RegexParsers {
   def exp: Parser[Exp] = arrows(List()) <~ """\s*""".r
 
 }
-object CcParserNew extends CcParser {
 
-}
-
-class CcParser2 extends RegexParsers {
-  def prop: Parser[Prop] = "●" ^^^ Prop()
-  def typ: Parser[Typ] = "□" ^^^ Typ()
-
-  def varName: Parser[String] = """[a-z|A-Z|_][a-z|A-Z|0-9|'|_]*""".r
-
-  def variable(ctx: List[String]): Parser[Var] = varName ^? (
-    { case name if ctx.contains(name) => Var(ctx.indexOf(name)) },
-    { name => s"no var in scope with name $name" })
-
-  def scope(v: String, ctx: List[String]): Parser[Exp] = ("." ~> exp(v :: ctx))
-
-  def lam(ctx: List[String]): Parser[Lam] = (("λ" ~> varName <~ ":") >> { v => apps(ctx) ~ scope(v, ctx) }) ^^
-    { case ty ~ bod => Lam(ty, bod) }
-
-  def pi(ctx: List[String]): Parser[Pi] = (("Π" ~> varName <~ ":") >> { v => apps(ctx) ~ scope(v, ctx) }) ^^
-    { case ty ~ bod => Pi(ty, bod) }
-
-  def apps(ctx: List[String]): Parser[Exp] = (exp(ctx) ~ (exp(ctx) *)) ^^
-    { case head ~ rest => rest.foldLeft[Exp](head)(App) }
-
-  def exp(ctx: List[String]): Parser[Exp] = prop | typ | variable(ctx) | lam(ctx) | pi(ctx) | "(" ~> apps(ctx) <~ ")" | "[" ~> exp(ctx) <~ "]"
-
-  def totalParse = apps(List()) <~ """\s*""".r
-
-}
 
 object CcParser extends CcParser {
 

@@ -1,2 +1,0 @@
-language: scala
-sudo: false # makes things go faster?

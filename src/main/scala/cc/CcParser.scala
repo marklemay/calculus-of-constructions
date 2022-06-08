@@ -19,10 +19,10 @@ class CcParser extends RegexParsers {
 
   def scope[X](v: String, ctx: List[String])(ctxParser: List[String] => Parser[X]): Parser[X] = ("." ~> ctxParser(v :: ctx))
 
-  //left associative, TODO: there should be something in the defualt lib for this?
+  //left associative, TODO: there should be something in the default lib for this?
   def withInfix[X](underlying: Parser[X], s: String, f: X => X => X): Parser[X] = {
 
-    def rest(l: X): Parser[X] = (s ~> underlying >> { r => rest(f(l)(r)) }) | "" ^^^ l //TODO: more idomatic way?
+    def rest(l: X): Parser[X] = (s ~> underlying >> { r => rest(f(l)(r)) }) | "" ^^^ l //TODO: more idiomatic way?
 
     for {
       x <- underlying

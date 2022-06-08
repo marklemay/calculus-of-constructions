@@ -1,5 +1,5 @@
 # calculus-of-constructions
-[![Build Status](https://travis-ci.com/marklemay/calculus-of-constructions.svg?branch=master)](https://travis-ci.com/marklemay/calculus-of-constructions)
+[![Scala CI](https://github.com/marklemay/calculus-of-constructions/actions/workflows/scala.yml/badge.svg)](https://github.com/marklemay/calculus-of-constructions/actions/workflows/scala.yml)
 
 A simple reference implementation of the pure Calculus of Constructions in Scala.
 

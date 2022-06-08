@@ -13,7 +13,7 @@ import CcProperties._
 
 import org.scalacheck.ScalacheckShapeless._
 
-object NormalFormSpec extends Properties("NormalFormSpec.scala") {
+object NormalFormSpec extends Properties("NormalFormSpec") {
 
   override def overrideParameters(p: Test.Parameters): Test.Parameters =
     p.withMinSuccessfulTests(100) // 1000000 is good for a coffee break :)
@@ -51,7 +51,7 @@ object NormalFormSpec extends Properties("NormalFormSpec.scala") {
     n == NormalForm.toNeutral(NormalForm.toExp(n)).get
   }
 
-  property("Ty Normal expressions represent types if they typecheck (could be an open expression)") = forAll { n: NormalForm.TyNormal =>
+  property("Ty Normal expressions represent types if they type check (could be an open expression)") = forAll { n: NormalForm.TyNormal =>
     NormalForm.toExp(n).ty().isDefined ==> {
       NormalForm.toExp(n).isType
     }
@@ -69,11 +69,11 @@ object NormalFormSpec extends Properties("NormalFormSpec.scala") {
     NormalForm.toExp(n).isValue
   }
 
-  property("if it type checks (it normalizes) then can be reduced to normal form") = forAll { e: Exp =>
-    e.ty().isDefined ==> {
-      NormalForm.toNomal(e.norm).isDefined
-    }
-  }
+//  property("if it type checks (it normalizes) then can be reduced to normal form") = forAll { e: Exp =>
+//    e.ty().isDefined ==> {
+//      NormalForm.toNomal(e.norm).isDefined
+//    }
+//  }
 
   //Note: not actually true since "λ A : [λ B : ● . □] . ●"
   //  property("if it normalizes, itcan be reduced to normal form") = forAll { e: Exp =>

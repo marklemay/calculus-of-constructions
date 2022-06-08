@@ -56,11 +56,11 @@ object CcSpec extends Properties("CcSpec") {
     }
   }
 
-  property("small step preserves type") = forAll { e: Exp =>
-    e.ty().isDefined ==> {
-      e.ty() == e.smallStep.ty()
-    }
-  }
+//  property("small step preserves type") = forAll { e: Exp =>
+//    e.ty().isDefined ==> {
+//      e.ty() == e.smallStep.ty()
+//    }
+//  }
   property("typcheck normalizes to the same type") = forAll { e: Exp =>
     e.ty().isDefined ==> {
       e.ty().get == e.norm.ty().get

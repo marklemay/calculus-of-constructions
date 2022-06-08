@@ -14,6 +14,6 @@ libraryDependencies ++= Seq(
 
 scalacOptions ++= Seq("-deprecation", "-feature")
 
-//Test / testOptions += Tests.Argument(TestFrameworks.ScalaCheck, "-maxDiscardRatio", "20")
+Test / testOptions += Tests.Argument(TestFrameworks.ScalaCheck, "-maxDiscardRatio", "20")
 //testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxDiscardRatio", "20")
 

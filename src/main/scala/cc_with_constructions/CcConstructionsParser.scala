@@ -2,6 +2,7 @@ package cc_with_constructions
 
 import scala.util.parsing.combinator._
 import cc.Cc._
+import scala.language.postfixOps
 import scala.annotation.migration
 
 //TODO: still very inefficient
@@ -23,7 +24,7 @@ class CcConstructionsParser extends RegexParsers {
   def pi(ctx: List[String])(config: ConstructionsConfig): Parser[Pi] = (("Π" ~> varName <~ ":") >> { v => subExp(ctx)(config) ~ scope(v, ctx)(config) }) ^^
     { case ty ~ bod => Pi(ty, bod) }
 
-  //TODO: there should be a better way to propogate errors here
+  //TODO: there should be a better way to propagate errors here
   def apps(ctx: List[String])(config: ConstructionsConfig): Parser[Exp] = (exp(ctx)(config) ~ (exp(ctx)(config) *)) ^^
     { case head ~ rest => rest.foldLeft[Exp](head)(App) }
 

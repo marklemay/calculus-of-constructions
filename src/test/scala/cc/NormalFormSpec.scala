@@ -16,7 +16,7 @@ import org.scalacheck.ScalacheckShapeless._
 object NormalFormSpec extends Properties("NormalFormSpec.scala") {
 
   override def overrideParameters(p: Test.Parameters): Test.Parameters =
-    p.withMinSuccessfulTests(100000) // 1000000 is good for a coffee break :)
+    p.withMinSuccessfulTests(1000) // 1000000 is good for a coffee break :)
 
   //TODO: refactor out redundent generator bits
   def genVar: Gen[Var] = {

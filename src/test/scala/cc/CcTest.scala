@@ -46,10 +46,10 @@ class CcTest {
 
     val functionApp1 = cc"λ A : ● . λ f : [Πa:A. A] .  λ a : A . (f a) ".asObject[Any => (Int => Int) => (Int => Int)]
 
-    assert(functionApp1("whatever") { x: Int => x * x }(3) == 9)
+    assert(functionApp1("whatever") { (x: Int) => x * x }(3) == 9)
 
     val functionApp2 = cc"λ A : ● . λ f : [Πa:A. A] .  λ a : A . (f (f a)) ".asObject[Any => (Int => Int) => (Int => Int)]
 
-    assert(functionApp2("whatever") { x: Int => x * x }(3) == 81)
+    assert(functionApp2("whatever") { (x: Int) => x * x }(3) == 81)
   }
 }

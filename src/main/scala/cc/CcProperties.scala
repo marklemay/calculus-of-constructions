@@ -98,7 +98,7 @@ object CcProperties {
 
         case Var(i)      => ctx(i)
 
-        case Lam(_, bod) => { x: Any => rec(bod, x :: ctx) }
+        case Lam(_, bod) => { (x: Any) => rec(bod, x :: ctx) }
 
         case App(f, a) => {
           val ff = rec(f, ctx).asInstanceOf[Any => Any]

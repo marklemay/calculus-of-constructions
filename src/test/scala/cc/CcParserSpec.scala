@@ -18,7 +18,7 @@ import CcProperties._
 object CcParserSpec extends Properties("CcParserSpec") {
 
   override def overrideParameters(p: Test.Parameters): Test.Parameters =
-    p.withMinSuccessfulTests(1000) // 1000000 is good for a coffee break :)
+    p.withMinSuccessfulTests(100) // 1000000 is good for a coffee break :)
 
   def genVar: Gen[Var] = {
     for {
@@ -49,7 +49,7 @@ object CcParserSpec extends Properties("CcParserSpec") {
     }
   }
 
-  // the above test makes this redundent
+  // the above test makes this redundant
   property("can always parse a closed term") = forAll { e: Exp =>
     e.freeVars.isEmpty ==> {
       CcParser.parse(e.toString()).successful

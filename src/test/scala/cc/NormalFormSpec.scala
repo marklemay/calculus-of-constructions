@@ -16,7 +16,7 @@ import org.scalacheck.ScalacheckShapeless._
 object NormalFormSpec extends Properties("NormalFormSpec.scala") {
 
   override def overrideParameters(p: Test.Parameters): Test.Parameters =
-    p.withMinSuccessfulTests(1000) // 1000000 is good for a coffee break :)
+    p.withMinSuccessfulTests(100) // 1000000 is good for a coffee break :)
 
   //TODO: refactor out redundent generator bits
   def genVar: Gen[Var] = {
@@ -69,7 +69,7 @@ object NormalFormSpec extends Properties("NormalFormSpec.scala") {
     NormalForm.toExp(n).isValue
   }
 
-  property("if it typechecks (it normalizes) then can be reduced to normal form") = forAll { e: Exp =>
+  property("if it type checks (it normalizes) then can be reduced to normal form") = forAll { e: Exp =>
     e.ty().isDefined ==> {
       NormalForm.toNomal(e.norm).isDefined
     }
@@ -89,25 +89,25 @@ object NormalFormSpec extends Properties("NormalFormSpec.scala") {
   }
 
   //TODO: these will be pretty sparse
-  property("if an exppression can be put in normal from, it can be round tripped") = forAll { e: Exp =>
+  property("if an expression can be put in normal from, it can be round tripped") = forAll { e: Exp =>
     NormalForm.toNomal(e).isDefined ==> {
       NormalForm.toExp(NormalForm.toNomal(e).get) == e
     }
   }
 
-  property("if an exppression can be put in type normal from, it can be round tripped") = forAll { e: Exp =>
+  property("if an expression can be put in type normal from, it can be round tripped") = forAll { e: Exp =>
     NormalForm.toTyNomal(e).isDefined ==> {
       NormalForm.toExp(NormalForm.toTyNomal(e).get) == e
     }
   }
 
-  property("if an exppression can be put in Neutral from, it can be round tripped") = forAll { e: Exp =>
+  property("if an expression can be put in Neutral from, it can be round tripped") = forAll { e: Exp =>
     NormalForm.toNeutral(e).isDefined ==> {
       NormalForm.toExp(NormalForm.toNeutral(e).get) == e
     }
   }
 
-  //TODO: index by a rendomized number of steps
+  //TODO: index by a randomized number of steps
   def eventuallyNormalizes(e: Exp): Boolean = eventualValue(e).isDefined
 
   def eventualValue(e: Exp): Option[Exp] = {

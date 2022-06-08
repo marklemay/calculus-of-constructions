@@ -16,7 +16,7 @@ import org.scalacheck.ScalacheckShapeless._
 object CcSpec extends Properties("CcSpec") {
 
   override def overrideParameters(p: Test.Parameters): Test.Parameters =
-    p.withMinSuccessfulTests(1000) // 1000000 is good for a coffee break :)
+    p.withMinSuccessfulTests(100) // 1000000 is good for a coffee break :)
 
   def genVar: Gen[Var] = {
     for {

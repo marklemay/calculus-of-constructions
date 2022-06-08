@@ -17,7 +17,7 @@ import cc_with_constructions.Constructions.ProdConstruction
 object CcConstructionSpec extends Properties("CcConstructionSpec") {
 
   override def overrideParameters(p: Test.Parameters): Test.Parameters =
-    p.withMinSuccessfulTests(1000) // 1000000 is good for a coffee break :)
+    p.withMinSuccessfulTests(10) // 1000000 is good for a coffee break :)
 
   def genVar: Gen[Var] = {
     for {

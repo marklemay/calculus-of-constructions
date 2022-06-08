@@ -43,7 +43,7 @@ object Cc {
       case App(f, a)           => App(f.open(under), a.open(under))
     }
 
-    val isSort = this match {
+    val isSort: Boolean = this match {
       case Prop() => true
       case Typ()  => true
       case _      => false

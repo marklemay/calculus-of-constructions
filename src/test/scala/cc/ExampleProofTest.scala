@@ -17,10 +17,10 @@ import org.junit.Ignore
 
 class ExampleProofTest {
 
-  implicit val config = ConstructionsConfig(ArrowConstruction, ProdConstruction)
+  implicit val config: ConstructionsConfig = ConstructionsConfig(ArrowConstruction, ProdConstruction)
 
   @Test
-  def AimpliesATest {
+  def AimpliesATest: Unit = {
 
     val thrm = ccc"Π A : ● . A → A"
 
@@ -30,7 +30,7 @@ class ExampleProofTest {
   }
 
   @Test
-  def AimpliesAxATest {
+  def AimpliesAxATest: Unit = {
 
     val thrm = ccc"Π A : ● . A → (A × A)"
 
@@ -40,7 +40,7 @@ class ExampleProofTest {
   }
 
   @Test
-  def AxBimpliesATest {
+  def AxBimpliesATest: Unit = {
 
     val thrm = ccc"Π A : ● . Π B : ● . (A × B) → A"
 
@@ -52,7 +52,7 @@ class ExampleProofTest {
   //TODO: AxBimpliesBTest
 
   @Test
-  def AxBimpliesBxATest {
+  def AxBimpliesBxATest: Unit = {
 
     val thrm = ccc"Π A : ● . Π B : ● . (A × B) → (B × A)"
 
@@ -69,7 +69,7 @@ class ExampleProofTest {
   }
 
   @Test
-  def prod_comm {
+  def prod_comm: Unit = {
     val thrm = ccc"Π A : ● . Π B : ● . A × B → B × A"
     val proof = ccc"λ A : ● . λ B : ● . λ p : A × B . λ OUT : ● . λ f : B → A → OUT . f (p B (λ a : A . λ b : B . b)) (p A (λ a : A . λ b : B . a))"
     assertEquals(thrm, proof.ty().get)
@@ -77,7 +77,7 @@ class ExampleProofTest {
 
   @Ignore
   @Test
-  def prod_assoc {
+  def prod_assoc: Unit = {
     val thrm = ccc"Π A : ● . Π B : ● . Π C : ● . A × B × C → (A × B) × C"
     val proof = ccc"λ A : ● . λ B : ● . λ C : ● . λ p : A × B × C . λ OUT : ● . λ f : A × B → C → OUT . f (λ OUT0 : ● . λ f0 : A → B → OUT0 . f0 (p A (λ a : A . λ _ : B × C . a)) (p (B × C) (λ _ : A . λ b : B × C . b) B (λ a : B . λ _ : C . a))) (p (B × C) (λ _ : A . λ b : B × C . b) C (λ _ : B . λ b : C . b))"
     assertEquals(thrm, proof.ty().get)

@@ -37,7 +37,7 @@ object Constructions { //TODO: paramiterixe these over generalized epressions?  
     def parser(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser)(parseLessPrecidence: restParser.Parser[Exp]): restParser.Parser[Constructed]
 
     //TODO a little funny
-    def parserExp(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser)(parseLessPrecidence: restParser.Parser[Exp]) = parser(ctx)(config)(restParser)(parseLessPrecidence).map(toExp)
+    def parserExp(ctx: List[String])(config: ConstructionsConfig)(restParser: CcConstructionsParser)(parseLessPrecidence: restParser.Parser[Exp]): restParser.Parser[Exp] = parser(ctx)(config)(restParser)(parseLessPrecidence).map(toExp)
   }
 
   //TODO: split these into seperate files?

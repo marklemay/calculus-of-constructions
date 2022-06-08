@@ -6,7 +6,7 @@ import cc.CcProperties.Appls
 
 object CcPrettyPrinter {
 
-  def paren(outer: Int)(inner: Int)(s: String) = if (outer < inner) { "(" ++ s ++ ")" } else s
+  def paren(outer: Int)(inner: Int)(s: String): String = if (outer < inner) { "(" ++ s ++ ")" } else s
 
   //TODO: rewrite monadicly
 

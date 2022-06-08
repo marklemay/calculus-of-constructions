@@ -33,11 +33,11 @@ class CcConstructionsParser extends RegexParsers {
     case head :: tail => head.parserExp(ctx)(config)(this)(parseConstruction(tail)(ctx)(config)) | parseConstruction(tail)(ctx)(config)
   }
 
-  def subExp(ctx: List[String])(config: ConstructionsConfig) = parseConstruction(config.configs.toList)(ctx)(config)
+  def subExp(ctx: List[String])(config: ConstructionsConfig): Parser[Exp] = parseConstruction(config.configs.toList)(ctx)(config)
 
   def exp(ctx: List[String])(config: ConstructionsConfig): Parser[Exp] = prop | typ | variable(ctx) | lam(ctx)(config) | pi(ctx)(config) | "(" ~> subExp(ctx)(config) <~ ")" | "[" ~> subExp(ctx)(config) <~ "]"
 
-  def totalParse(config: ConstructionsConfig) = subExp(List())(config) <~ """\s*""".r
+  def totalParse(config: ConstructionsConfig): Parser[Exp] = subExp(List())(config) <~ """\s*""".r
   
 }
 

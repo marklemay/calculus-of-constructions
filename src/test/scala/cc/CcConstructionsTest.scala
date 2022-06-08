@@ -13,7 +13,7 @@ import cc_with_constructions.CcConstructionsParser
 
 class CcConstructionsTest {
   @Test
-  def arrowTest {
+  def arrowTest: Unit = {
     import Constructions.ArrowConstruction._
 
     val a = Arrow(Typ(), Prop())
@@ -22,7 +22,7 @@ class CcConstructionsTest {
   }
 
   @Test
-  def arrowprintTest {
+  def arrowprintTest: Unit = {
     import Constructions.ArrowConstruction._
 
     import CcConstructionsPrettyPrinter._
@@ -34,7 +34,7 @@ class CcConstructionsTest {
   }
 
   @Test
-  def prodTest {
+  def prodTest: Unit = {
     import cc.Cc._
     import Constructions.ProdConstruction._
 
@@ -48,7 +48,7 @@ class CcConstructionsTest {
   }
 
   @Test
-  def prodprintTest {
+  def prodprintTest: Unit = {
     import Constructions.ProdConstruction._
 
     import CcConstructionsPrettyPrinter._
@@ -65,7 +65,7 @@ class CcConstructionsTest {
   }
 
   @Test
-  def arrowParserTest {
+  def arrowParserTest: Unit = {
     val exp = CcConstructionsParser.parse("Π A : ● . Π B : ● . A → B")(ConstructionsConfig(Constructions.ArrowConstruction))
     //A → A → B
     //TODO: mixin application into
@@ -80,7 +80,7 @@ class CcConstructionsTest {
   }
 
   @Test
-  def arrowProdParserTest {
+  def arrowProdParserTest: Unit = {
     val exp = CcConstructionsParser.parse("Π A : ● . Π B : ● . (A × A × A) → (B × B)")(ConstructionsConfig(Constructions.ProdConstruction, Constructions.ArrowConstruction))
 
     //A → A → B

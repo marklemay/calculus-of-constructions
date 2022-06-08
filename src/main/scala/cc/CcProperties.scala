@@ -6,7 +6,7 @@ import cc_with_constructions.ConstructionsConfig
 // additional features that are nice to have but are not needed for the core normalization and type checking
 object CcProperties {
 
-  implicit def expToRichExp(exp: Exp) = new RichExp(exp)
+  implicit def expToRichExp(exp: Exp): RichExp = new RichExp(exp)
 
   class RichExp(exp: Exp) {
 

@@ -7,7 +7,7 @@ import CcProperties._
 
 class CcTest {
   @Test
-  def simpleTests {
+  def simpleTests: Unit = {
     val exp = cc"λ X: ●. λx:X. x "
 
     assert(exp == exp.norm)
@@ -25,14 +25,14 @@ class CcTest {
   }
 
   @Test
-  def smallstepMatchesBigStepTests {
+  def smallstepMatchesBigStepTests: Unit = {
     val e = cc"λ A : ● . λ B : □ . (● ([λ C : □ . □] □))"
 
     assert(e.norm == e.smallStep)
   }
 
   @Test
-  def ccAsScalaObject {
+  def ccAsScalaObject: Unit = {
 
     val e = cc"λ A : ● . A".asObject[Int => Int]
 

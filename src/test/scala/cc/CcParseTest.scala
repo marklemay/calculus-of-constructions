@@ -6,19 +6,19 @@ import cc.Cc._
 
 class CcParseTest {
   @Test
-  def propTest {
+  def propTest: Unit = {
     assert(cc"●" == Prop())
 
   }
 
   @Test
-  def bracketTest {
+  def bracketTest: Unit = {
     assert(cc"Π A : ● . [A]" == Pi(Prop(), Var(0)))
 
   }
 
   @Test
-  def topLevelAppTest {
+  def topLevelAppTest: Unit = {
     assert(cc"● ●" == App(Prop(), Prop()))
 
   }
